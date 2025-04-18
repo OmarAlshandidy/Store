@@ -14,10 +14,17 @@ namespace Presentation
     public class ProductsController(IServiceManger serviceManger):ControllerBase  
     {
         // EndPoint : public non-static method
+
+        // Sorting : nameasc [defult ]
+        // sort : namedes
+        // sort : priceDesc
+        // sor :  priceasc
+
+
         [HttpGet] // Get : /Api/products
-        public async Task<IActionResult> GetAllProducts()
+        public async Task<IActionResult> GetAllProducts(int? brandId, int? typeId,string? sort , int pageIndex = 1 , int pageSize=5)
         {
-            var result = await serviceManger.productService.GetAllProductAsync();
+            var result = await serviceManger.productService.GetAllProductAsync(brandId , typeId,sort, pageIndex, pageSize);
             if (result == null) return BadRequest(); //400
             return Ok(result); // 200 
         }
@@ -31,14 +38,14 @@ namespace Presentation
         }
 
         [HttpGet("brands")]
-        public async Task<IActionResult> GetAllBrands()
+        public async Task<IActionResult> GetAllBrands()   // Get : /api/products/brands
         {
                var result = await serviceManger.productService.GetAllBrandsAsync();
             if(result == null) return BadRequest();//400
             return Ok(result); //200
         }
         [HttpGet("types")]
-        public async  Task<IActionResult> GetAllTypes()
+        public async  Task<IActionResult> GetAllTypes() // Get : /api/product/types
         {
             var result = await serviceManger.productService.GetAllTypesAsync();
             if(result == null) return BadRequest(); // 400
