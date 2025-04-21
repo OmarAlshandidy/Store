@@ -31,7 +31,7 @@ namespace Store.G04.Api.Middlewares
                 await HandlingErrorAsync(context, ex);
 
             }
-        }
+            }
 
         private static async Task HandlingErrorAsync(HttpContext context, Exception ex)
         {
@@ -48,6 +48,7 @@ namespace Store.G04.Api.Middlewares
             response.StatusCode = ex switch
             {
                 NotFoundException => StatusCodes.Status404NotFound,
+                BadHttpRequestException => StatusCodes.Status400BadRequest,
 
                 _ => StatusCodes.Status500InternalServerError
             };

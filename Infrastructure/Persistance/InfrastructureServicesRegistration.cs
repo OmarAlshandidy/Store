@@ -11,6 +11,8 @@ using Persistance.Data.Context;
 using Services;
 using Servies.Abstractions;
 using Persistance.UnitOfWorks;
+using StackExchange.Redis;
+using Persistance.Repositories;
 
 
 namespace Persistance
@@ -25,7 +27,13 @@ namespace Persistance
             });
 
            services.AddScoped<IDbInitializer, DbInitializer>();  // Allow DI DbInitializer
-            services.AddScoped<IUnitOfWork,UnitOfWork>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IBasketRepository, BasketRepository>();
+
+            services.AddSingleton<IConnectionMultiplexer> ((serviesProvidor) =>
+            {
+                return ConnectionMultiplexer.Connect(configuration.GetConnectionString("Redis")!);
+            });
             return services;
         } 
         
