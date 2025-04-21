@@ -9,7 +9,7 @@ using Domain.Models;
 using Persistance.Data.Context;
 using Persistance.Repositories;
 
-namespace Persistance.UnitOfWork
+namespace Persistance.UnitOfWorks
 {
     public class UnitOfWork : IUnitOfWork
     {
