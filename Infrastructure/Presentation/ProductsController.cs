@@ -34,7 +34,6 @@ namespace Presentation
         public async Task<IActionResult>  GetProductByIdAsyn(int id)
         {
            var resalt = await serviceManger.productService.GetProductAsync(id);
-            if(resalt is null ) return NotFound();    // 404
             return Ok(resalt);
         }
 

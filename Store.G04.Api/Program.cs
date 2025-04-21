@@ -1,12 +1,15 @@
 
 using System.Threading.Tasks;
 using Domain.Contracts;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Persistance;
 using Persistance.Data.Context;
 using Persistance.UnitOfWork;
 using Services;
 using Servies.Abstractions;
+using Shared.ErrorModels;
+using Store.G04.Api.Middlewares;
 
 namespace Store.G04.Api
 {
@@ -32,6 +35,26 @@ namespace Store.G04.Api
             builder.Services.AddScoped<IUnitOfWork,UnitOfWork>();
             builder.Services.AddScoped<IServiceManger, ServiceManeger>();
             builder.Services.AddAutoMapper(typeof(AssemblyReference_Service).Assembly);
+
+            builder.Services.Configure<ApiBehaviorOptions>(config =>
+            {
+                config.InvalidModelStateResponseFactory = (actionContext) =>
+                {
+                   var errors= actionContext.ModelState.Where(m => m.Value.Errors.Any())
+                                                .Select(m => new ValidationError()
+                                                {
+                                                    Field = m.Key,
+                                                    Errors = m.Value.Errors.Select(errors => errors.ErrorMessage)
+                                                });
+
+                    var response = new ValidationErrorResponse()
+                    {
+                        Errors = errors
+                    };
+                    return new BadRequestObjectResult(response);
+
+                };
+            });
             var app = builder.Build();
             #region Seeding
             using var scope = app.Services.CreateScope();
@@ -39,6 +62,7 @@ namespace Store.G04.Api
             await dbIntializer.InitializeAsync();
 
             #endregion
+            app.UseMiddleware<GlobalErrorHandlingMiddleware>();
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
