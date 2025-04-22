@@ -67,5 +67,6 @@ namespace Store.G04.Api.Middlewares
             };
             await context.Response.WriteAsJsonAsync(response);
         }
+
     }
 }
