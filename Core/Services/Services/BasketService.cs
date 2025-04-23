@@ -10,7 +10,7 @@ using Domain.Models;
 using Servies.Abstractions;
 using Shared;
 
-namespace Services
+namespace Services.Services
 {
     public class BasketService(IBasketRepository basketRepository,IMapper mapper) : IBasketService
     {

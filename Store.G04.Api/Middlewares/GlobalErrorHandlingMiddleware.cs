@@ -49,6 +49,9 @@ namespace Store.G04.Api.Middlewares
             {
                 NotFoundException => StatusCodes.Status404NotFound,
                 BadHttpRequestException => StatusCodes.Status400BadRequest,
+                UnauthorizedAccessException => StatusCodes.Status401Unauthorized,
+                ValidationException => HandlingValidationException((ValidationException)ex, response),
+
 
                 _ => StatusCodes.Status500InternalServerError
             };
@@ -66,6 +69,11 @@ namespace Store.G04.Api.Middlewares
                 ErrorMessage = $"End Point{context.Request.Path} is Not Found"
             };
             await context.Response.WriteAsJsonAsync(response);
+        }
+        private static int HandlingValidationException(ValidationException ex ,ErrorDetails response )
+        {
+            response.Errors = ex.Errors;
+            return StatusCodes.Status400BadRequest;
         }
 
     }

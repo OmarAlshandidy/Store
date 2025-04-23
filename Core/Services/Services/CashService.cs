@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Domain.Contracts;
 using Servies.Abstractions;
 
-namespace Services
+namespace Services.Services
 {
     public class CashService(ICashRepository cashRepository) : ICashService
     {

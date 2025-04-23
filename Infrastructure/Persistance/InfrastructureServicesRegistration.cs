@@ -13,6 +13,7 @@ using Servies.Abstractions;
 using Persistance.UnitOfWorks;
 using StackExchange.Redis;
 using Persistance.Repositories;
+using Persistance.Identity;
 
 
 namespace Persistance
@@ -25,8 +26,12 @@ namespace Persistance
             {
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
             });
+            services.AddDbContext<StoreIdentityDbContext>(options =>
+            {
+                options.UseSqlServer(configuration.GetConnectionString("IdentityConnection"));
+            });
 
-           services.AddScoped<IDbInitializer, DbInitializer>();  // Allow DI DbInitializer
+            services.AddScoped<IDbInitializer, DbInitializer>();  // Allow DI DbInitializer
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IBasketRepository, BasketRepository>();
             services.AddScoped<ICashRepository, CashRepository>();
