@@ -1,12 +1,17 @@
 ﻿using Domain.Contracts;
 using Domain.Models.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Persistance;
 using Persistance.Identity;
 using Services;
+using Shared;
 using Shared.ErrorModels;
 using Store.G04.Api.Middlewares;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Microsoft.Extensions.Configuration;
 
 namespace Store.G04.Api.Extensions
 {
@@ -19,10 +24,12 @@ namespace Store.G04.Api.Extensions
 
             services.AddIdentityServies();
           services.AddInfrastructureServices(configuration);
-          services.AddApplicationServices();
+          services.AddApplicationServices(configuration);
+           
 
             services.ConfigureServies();
 
+            services.ConfigureJwtService(configuration);
 
 
             return services;
@@ -33,6 +40,33 @@ namespace Store.G04.Api.Extensions
             return services;
 
         }
+        private static IServiceCollection ConfigureJwtService (this IServiceCollection services ,IConfiguration configuration)
+        {
+            var jwtOptions = configuration.GetSection("JwtOptions").Get<JwtOptions>();
+            services.AddAuthentication(opation =>
+            {
+                opation.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                opation.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+
+            }).AddJwtBearer(option =>
+            {
+                option.TokenValidationParameters = new TokenValidationParameters()
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidateLifetime = true,
+
+                    ValidIssuer = jwtOptions.Issuer,
+                    ValidAudience = jwtOptions.Audience,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SecretKey))
+
+                };
+            });
+            return services;
+
+        }
+
         private static IServiceCollection AddIdentityServies(this IServiceCollection services)
         {
             services.AddIdentity<AppUser,IdentityRole>()
@@ -88,7 +122,7 @@ namespace Store.G04.Api.Extensions
             }
             app.UseStaticFiles();
             app.UseHttpsRedirection();
-
+            app.UseAuthentication();
             app.UseAuthorization();
 
 
