@@ -29,5 +29,7 @@ namespace Services
         public ICashService cashService { get; } = new CashService(cashRepository);
 
         public IAuthService authService { get; } = new AuthService(userManager, options);
+
+        public IOrderService orderService { get; } = new OrderService(mapper, basketRepository,unitOfWork);
     } 
 }
