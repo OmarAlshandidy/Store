@@ -44,8 +44,13 @@ namespace Services.Services
             var subTotal = orderItems.Sum(i=>i.Price * i.Quantity);
             // 5. Todo : Create Payment Intent Id ---- 
 
+            // Check Order Exists 
+            var spec = new OrderWithPaymentInentSpecifications(basket.PaymentIntentId);
+            var existOrder = await unitOfWork.GetRepository<Order, Guid>().GetAsync(spec);
+            if (existOrder is not null)
+                unitOfWork.GetRepository<Order, Guid>().Delete(existOrder);
             // Create Order 
-            var order = new Order(userEmail, address,orderItems, delivaryMethod, subTotal, "");
+            var order = new Order(userEmail, address,orderItems, delivaryMethod, subTotal, basket.PaymentIntentId);
               await unitOfWork.GetRepository<Order,Guid>().AddAsync(order);
             var count =   await unitOfWork.SaveChangesAsync();
             if (count == 0) throw new OrderCreateBadRequestException();

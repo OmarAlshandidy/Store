@@ -19,7 +19,8 @@ namespace Services
         ,IBasketRepository basketRepository
         ,ICashRepository cashRepository,
         UserManager<AppUser> userManager,
-      IOptions<JwtOptions> options
+      IOptions<JwtOptions> options,
+      IConfiguration configuration
         ) : IServiceManger
     {
         public IProductService productService { get; }  = new ProductService(unitOfWork,mapper);
@@ -28,8 +29,10 @@ namespace Services
 
         public ICashService cashService { get; } = new CashService(cashRepository);
 
-        public IAuthService authService { get; } = new AuthService(userManager, options);
+        public IAuthService authService { get; } = new AuthService(userManager, mapper, options);
 
         public IOrderService orderService { get; } = new OrderService(mapper, basketRepository,unitOfWork);
+
+        public IPaymentService paymentService { get; } = new PaymentService(mapper, basketRepository,unitOfWork,configuration);
     } 
 }
